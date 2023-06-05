@@ -11,11 +11,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
-import org.springframework.util.MultiValueMap;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @SpringBootTest
 public class GithubServiceTest {
