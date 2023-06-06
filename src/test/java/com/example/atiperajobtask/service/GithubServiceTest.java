@@ -5,10 +5,11 @@ import com.example.atiperajobtask.api.dto.GithubRepo;
 import com.example.atiperajobtask.model.GithubRepoProcessed;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-
+@ActiveProfiles("test")
 public class GithubServiceTest {
 
     @Test

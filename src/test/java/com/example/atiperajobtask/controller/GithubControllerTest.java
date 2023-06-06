@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(
@@ -19,6 +20,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
         stubs = "classpath:/stubs"
 )
 @AutoConfigureWebTestClient
+@ActiveProfiles("test")
 public class GithubControllerTest {
     @Autowired
     private WebTestClient webTestClient;
