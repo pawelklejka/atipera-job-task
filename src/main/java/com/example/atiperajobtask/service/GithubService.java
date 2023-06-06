@@ -1,8 +1,8 @@
 package com.example.atiperajobtask.service;
 
 import com.example.atiperajobtask.api.GithubClient;
-import com.example.atiperajobtask.api.dto.Branch;
 import com.example.atiperajobtask.model.GithubRepoProcessed;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
@@ -10,32 +10,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class GithubService {
     private final GithubClient githubClient;
 
-    public GithubService(GithubClient githubClient) {
-        this.githubClient = githubClient;
-    }
-
     public List<GithubRepoProcessed> findAll(String userName, HttpHeaders headers){
+        return githubClient.getGithubRepos(userName, headers).stream()
+                .filter(repo -> !repo.fork())
+                .map(repo -> {
+                    var repoName = repo.name();
 
-        List<GithubRepoProcessed> githubRepos = githubClient.getGithubRepos(userName, headers).stream()
-                .filter(r -> !r.fork())
-                .map(r -> {
-                    String[] ownerAndReponame = r.name().split("/");
-                    String ownerOfRepo = ownerAndReponame[0];
-                    String repoName = ownerAndReponame[1];
+                    var branches  = githubClient.getBranches(userName, repoName);
 
-                    List<Branch> branches  = githubClient.getBranches(ownerOfRepo, repoName);
-
-                    return GithubRepoProcessed.builder()
-                            .name(repoName)
-                            .ownerName(ownerOfRepo)
-                            .branches(branches)
-                            .build();
+                    return new GithubRepoProcessed(repoName, userName, branches);
                 })
                 .collect(Collectors.toList());
-        return githubRepos;
     }
 
 }

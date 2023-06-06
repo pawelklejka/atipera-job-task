@@ -1,0 +1,13 @@
+{
+  "request": {
+    "urlPattern": "/repos/pawelklejka/airlines-backend/branches",
+    "method": "GET"
+  },
+  "response": {
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "status": 200,
+    "bodyFileName": "branches.json"
+  }
+}

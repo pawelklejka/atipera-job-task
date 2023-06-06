@@ -1,0 +1,18 @@
+{
+  "request": {
+    "urlPattern": "/users/pawelklejka/repos",
+    "headers": {
+      "Accept": {
+        "contains": "application/xml"
+      }
+    },
+    "method": "GET"
+  },
+  "response": {
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "status": 415,
+    "bodyFileName": "unsupportedAccept.json"
+  }
+}

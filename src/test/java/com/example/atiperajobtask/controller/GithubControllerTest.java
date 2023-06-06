@@ -1,82 +1,77 @@
 package com.example.atiperajobtask.controller;
 
 import com.example.atiperajobtask.AtiperaJobTaskApplication;
-import org.json.JSONException;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
-import org.springframework.http.*;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Objects;
-
+import org.springframework.http.MediaType;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(
-        classes = AtiperaJobTaskApplication.class,
+        classes = {AtiperaJobTaskApplication.class},
         webEnvironment = WebEnvironment.RANDOM_PORT
 )
-@AutoConfigureWireMock(port = 0)
+@AutoConfigureWireMock(
+        port = 0,
+        stubs = "classpath:/stubs"
+)
+@AutoConfigureWebTestClient
 public class GithubControllerTest {
     @Autowired
-    private TestRestTemplate testRestTemplate;
+    private WebTestClient webTestClient;
 
     @Test
-    void shouldReturn406WhenAcceptHeaderIsApplicationXml() throws JSONException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(List.of(MediaType.APPLICATION_XML));
-        HttpEntity request = new HttpEntity(headers);
-
-        ResponseEntity<byte[]> responseEntity = testRestTemplate.exchange(
-                "/repos/pawelklejka",
-                HttpMethod.GET,
-                request,
-                byte[].class
-        );
-
-        String response = new String(Objects.requireNonNull(responseEntity.getBody()), StandardCharsets.UTF_8);
-
-        JSONAssert.assertEquals(
-                """
-                        {
-                            "status": "406 NOT_ACCEPTABLE",
-                            "message": "Wrong accept header. Should be application/json"
-                        }
-                        """,
-                response,
-                JSONCompareMode.LENIENT
-        );
+    void shouldReturn406WhenAcceptHeaderIsApplicationXml() {
+        webTestClient.get()
+                .uri("/repos/pawelklejka")
+                .accept(MediaType.APPLICATION_XML)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("406 NOT_ACCEPTABLE")
+                .jsonPath("$.message").isEqualTo("Wrong accept header. Should be application/json");
     }
 
     @Test
-    void shouldReturn404WhenAcceptHeaderIsApplicationXml() throws JSONException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        HttpEntity request = new HttpEntity(headers);
+    void shouldReturn404WhenAcceptHeaderIsApplicationXml() {
+        webTestClient.get()
+                .uri("/repos/asdsaasd")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("404 NOT_FOUND")
+                .jsonPath("$.message").isEqualTo("There is not such a user in github. Check if username is not misspelled");
+    }
 
-        ResponseEntity<byte[]> responseEntity = testRestTemplate.exchange(
-                "/repos/jkasopdkapadszxc",
-                HttpMethod.GET,
-                request,
-                byte[].class
-        );
-
-        String response = new String(Objects.requireNonNull(responseEntity.getBody()), StandardCharsets.UTF_8);
-
-        JSONAssert.assertEquals(
-                """
-                        {
-                            "status": "404 NOT_FOUND",
-                            "message": "There is not such a user in github. Check if username is not misspelled"
-                        }
-                        """,
-                response,
-                JSONCompareMode.LENIENT
-        );
+    @Test
+    void shouldReturn200whenEverythingCorrect() {
+        webTestClient.get()
+                .uri("/repos/pawelklejka")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .json(
+                        """
+                        [
+                            {
+                                "repositoryName": "airlines-backend",
+                                "ownerName": "pawelklejka",
+                                "branches": [
+                                  {
+                                    "name": "dependabot/maven/com.itextpdf-itextpdf-5.5.13.3",
+                                    "commit": {
+                                      "sha": "e4c59d7e3518f0ad0a28bd61e72ba63097ed6ac3"
+                                    }
+                                  }
+                                ]
+                            }
+                        ]
+                        """
+                );
     }
 }

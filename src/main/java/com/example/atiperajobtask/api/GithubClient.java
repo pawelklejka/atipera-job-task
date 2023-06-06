@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 @FeignClient(
         name = "github-api",
-        url = "https://api.github.com",
+        url = "${api-client.github.url}",
         configuration = {FeignClientConfig.class})
 @Headers("Accept: application/json")
 public interface GithubClient {

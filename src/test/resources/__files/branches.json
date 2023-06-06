@@ -1,0 +1,10 @@
+[
+  {
+    "name": "dependabot/maven/com.itextpdf-itextpdf-5.5.13.3",
+    "commit": {
+      "sha": "e4c59d7e3518f0ad0a28bd61e72ba63097ed6ac3",
+      "url": "https://api.github.com/repos/pawelklejka/airlines-backend/commits/e4c59d7e3518f0ad0a28bd61e72ba63097ed6ac3"
+    },
+    "protected": false
+  }
+]
